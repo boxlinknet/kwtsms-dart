@@ -1,0 +1,24 @@
+# Dart/Flutter build output
+.dart_tool/
+build/
+
+# Package config
+.packages
+pubspec.lock
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Environment / credentials
+.env
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
