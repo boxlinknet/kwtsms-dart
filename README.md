@@ -1,4 +1,4 @@
-# kwtSMS for Dart
+# kwtSMS Dart Client
 
 [![pub package](https://img.shields.io/pub/v/kwtsms.svg)](https://pub.dev/packages/kwtsms)
 [![CI](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/test.yml/badge.svg)](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/test.yml)
