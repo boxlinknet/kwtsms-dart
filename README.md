@@ -1,4 +1,4 @@
-# kwtsms
+# kwtSMS for Dart
 
 [![pub package](https://img.shields.io/pub/v/kwtsms.svg)](https://pub.dev/packages/kwtsms)
 [![CI](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/test.yml/badge.svg)](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/test.yml)
@@ -503,8 +503,7 @@ Save the `msg-id` from the send response, then call `sms.status(msgId)`. For int
 
 - **kwtSMS Support center:** https://www.kwtsms.com/support.html
 - **API documentation (PDF):** https://www.kwtsms.com/doc/KwtSMS.com_API_Documentation_v41.pdf
-- **FAQ:** https://www.kwtsms.com/faq_all.php
-- **WhatsApp support:** +965.9922-0322
+- **FAQ:** https://www.kwtsms.com/faq/
 - **Library issues:** https://github.com/boxlinknet/kwtsms-dart/issues
 
 ## License
