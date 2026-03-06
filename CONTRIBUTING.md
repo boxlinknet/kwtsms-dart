@@ -7,8 +7,8 @@ Thank you for your interest in contributing to the kwtsms Dart client library. T
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/boxlinknet/kwtsms_dart.git
-cd kwtsms_dart
+git clone https://github.com/boxlinknet/kwtsms-dart.git
+cd kwtsms-dart
 ```
 
 2. Install dependencies:
