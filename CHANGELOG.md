@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.4] - 2026-03-06
+
+### Fixed
+- pub.dev links now match GitHub repo (homepage, issue_tracker, documentation)
+
 ## [0.1.3] - 2026-03-06
 
 ### Fixed
