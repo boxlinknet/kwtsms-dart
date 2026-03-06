@@ -32,7 +32,7 @@ void main() {
         markTestSkipped('DART_USERNAME / DART_PASSWORD not set');
         return;
       }
-      final bad = KwtSMS('wrong_user', 'wrong_pass', testMode: true, logFile: '');
+      final bad = KwtSMS('dart_wrong_user', 'dart_wrong_pass', testMode: true, logFile: '');
       final result = await bad.verify();
       expect(result.ok, isFalse);
       expect(result.error, isNotNull);

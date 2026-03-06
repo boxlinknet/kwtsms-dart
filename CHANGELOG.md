@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.8] - 2026-03-06
+
+### Fixed
+- Add `dart_` prefix to test credentials in integration tests (`dart_wrong_user` / `dart_wrong_pass`)
+
 ## [0.1.7] - 2026-03-06
 
 ### Added
