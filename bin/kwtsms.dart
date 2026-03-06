@@ -35,7 +35,7 @@ void main(List<String> args) async {
     case 'version':
     case '--version':
     case '-v':
-      print('kwtsms 0.1.6');
+      print('kwtsms 0.1.7');
     default:
       stderr.writeln('Unknown command: $command');
       _printUsage();

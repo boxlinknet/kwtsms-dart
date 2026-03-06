@@ -328,6 +328,19 @@ final vars = loadEnvFile('.env');
 print(vars['KWTSMS_USERNAME']);
 ```
 
+## Examples
+
+See the [example/](example/) directory for runnable code:
+
+| Example | Description |
+|---------|-------------|
+| [01_basic_usage](example/01_basic_usage.dart) | Load credentials, verify, send SMS, print result |
+| [02_otp_flow](example/02_otp_flow.dart) | Generate OTP, validate phone, send, save msg-id |
+| [03_bulk_sms](example/03_bulk_sms.dart) | Send to multiple numbers with mixed formats |
+| [04_shelf_endpoint](example/04_shelf_endpoint.dart) | Shelf HTTP endpoint for sending SMS with validation |
+| [05_error_handling](example/05_error_handling.dart) | Handle all error types with user-facing messages |
+| [06_otp_production](example/06_otp_production/) | Production OTP service: rate limiting, hashing, device attestation, resend cooldown |
+
 ## CLI Usage
 
 Install globally:
