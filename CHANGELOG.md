@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.7] - 2026-03-06
+
+### Added
+- Add Examples section to README with linked table of all runnable examples
+
 ## [0.1.6] - 2026-03-06
 
 ### Fixed
