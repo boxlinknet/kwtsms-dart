@@ -61,8 +61,8 @@ final config = OtpServiceConfig(
 ## Environment Variables
 
 ```ini
-KWTSMS_USERNAME=your_api_user
-KWTSMS_PASSWORD=your_api_pass
+KWTSMS_USERNAME=dart_username
+KWTSMS_PASSWORD=dart_password
 KWTSMS_SENDER_ID=YOUR-TRANSACTIONAL-ID
 KWTSMS_TEST_MODE=1
 KWTSMS_LOG_FILE=kwtsms.log
