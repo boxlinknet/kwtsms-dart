@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3] - 2026-03-06
+
+### Fixed
+- Remove `doc/` from git tracking (internal PRD, not part of published package)
+- Fix README title to proper brand casing: "kwtSMS for Dart"
+- Fix FAQ link (was pointing to deprecated faq_all.php)
+- Remove WhatsApp number from Help & Support section
+
 ## [0.1.2] - 2026-03-06
 
 ### Fixed
