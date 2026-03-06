@@ -1,6 +1,6 @@
 name: kwtsms
 description: Official Dart/Flutter client for the kwtSMS SMS gateway API (kwtsms.com).
-version: 0.1.1
+version: 0.1.2
 homepage: https://www.kwtsms.com/integrations.html
 repository: https://github.com/boxlinknet/kwtsms-dart
 

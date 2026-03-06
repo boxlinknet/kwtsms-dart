@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.2] - 2026-03-06
+
+### Fixed
+- Remove `.claude/` from git tracking (internal tool files, not project code)
+- Fix clone URL in CONTRIBUTING.md (underscore to dash)
+- Sync CLI version string with pubspec.yaml
+- Add `.claude/` to .gitignore
+
 ## [0.1.1] - 2026-03-06
 
 ### Fixed

@@ -19,6 +19,9 @@ pubspec.lock
 .env
 *.log
 
+# Claude Code (session data, project memory)
+.claude/
+
 # OS
 .DS_Store
 Thumbs.db
