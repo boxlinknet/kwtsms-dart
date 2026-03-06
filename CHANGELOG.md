@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.6] - 2026-03-06
+
+### Fixed
+- Rewrite FAQ section with numbered questions, spacing, and comprehensive answers matching other kwtSMS client libraries
+
 ## [0.1.5] - 2026-03-06
 
 ### Fixed

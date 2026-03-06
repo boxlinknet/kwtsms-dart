@@ -484,19 +484,32 @@ Before going live, verify:
 
 ## FAQ
 
-**Why do I get "Wrong username or password"?**
-The API uses separate API credentials, not your account mobile number. Check KWTSMS_USERNAME and KWTSMS_PASSWORD. If your password contains special characters (#, &, ?), make sure you are using POST with JSON (this library always does).
+**1. My message was sent successfully (result: OK) but the recipient didn't receive it. What happened?**
 
-**Why is my message not being delivered?**
-Check: (1) Is test mode off? (2) Is the message stuck in the queue at kwtsms.com? (3) Are you using `KWT-SMS` sender? Switch to a private sender ID. (4) Does the message contain emojis? This library strips them automatically, but check your message content.
+Check the **Sending Queue** at [kwtsms.com](https://www.kwtsms.com/login/). If your message is stuck there, it was accepted by the API but not dispatched. Common causes are emoji in the message, hidden characters from copy-pasting, or spam filter triggers. Delete it from the queue to recover your credits. Also verify that test mode is off (`KWTSMS_TEST_MODE=0`). Test messages are queued but never delivered.
 
-**Why do I get ERR028?**
-You must wait at least 15 seconds before sending to the same number again. The entire request is rejected if any number triggers this. For OTP, always send to one number per request.
+**2. What is the difference between Test mode and Live mode?**
 
-**Can I use this with Flutter?**
+**Test mode** (`KWTSMS_TEST_MODE=1`) sends your message to the kwtSMS queue but does NOT deliver it to the handset. No SMS credits are consumed. Use during development. **Live mode** (`KWTSMS_TEST_MODE=0`) delivers the message for real and deducts credits. Always develop in test mode and switch to live only when ready for production.
+
+**3. What is a Sender ID and why should I not use "KWT-SMS" in production?**
+
+A **Sender ID** is the name that appears as the sender on the recipient's phone (e.g., "MY-APP" instead of a random number). `KWT-SMS` is a shared test sender. It causes delivery delays, is blocked on Virgin Kuwait, and should never be used in production. Register your own private Sender ID through your kwtSMS account. For OTP/authentication messages, you need a **Transactional** Sender ID to bypass DND (Do Not Disturb) filtering.
+
+**4. I'm getting ERR003 "Authentication error". What's wrong?**
+
+You are using the wrong credentials. The API requires your **API username and API password**, NOT your account mobile number. Log in to [kwtsms.com](https://www.kwtsms.com/login/), go to Account > API settings, and check your API credentials. Also make sure you are using POST (not GET) and `Content-Type: application/json`.
+
+**5. Can I send to international numbers (outside Kuwait)?**
+
+International sending is **disabled by default** on kwtSMS accounts. Contact kwtSMS support to request activation for specific country prefixes. Use `sms.coverage()` to check which countries are currently active on your account. Be aware that activating international coverage increases exposure to automated abuse. Implement rate limiting and CAPTCHA before enabling.
+
+**6. Can I use this with Flutter?**
+
 Yes. The library works in both pure Dart (server-side) and Flutter (mobile) contexts. Install with `flutter pub add kwtsms`.
 
-**How do I check if a message was delivered?**
+**7. How do I check if a message was delivered?**
+
 Save the `msg-id` from the send response, then call `sms.status(msgId)`. For international numbers, use `sms.deliveryReport(msgId)` (wait 5+ minutes). Kuwait numbers do not support delivery reports.
 
 ## Help & Support
