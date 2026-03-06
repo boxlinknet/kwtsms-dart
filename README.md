@@ -1,5 +1,12 @@
 # kwtsms
 
+[![pub package](https://img.shields.io/pub/v/kwtsms.svg)](https://pub.dev/packages/kwtsms)
+[![CI](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/test.yml/badge.svg)](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/test.yml)
+[![Static Analysis](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/codeql.yml/badge.svg)](https://github.com/boxlinknet/kwtsms-dart/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Dart 3](https://img.shields.io/badge/dart-%3E%3D3.0-blue.svg)](https://dart.dev)
+[![pub points](https://img.shields.io/pub/points/kwtsms)](https://pub.dev/packages/kwtsms/score)
+
 Official Dart/Flutter client for the [kwtSMS](https://www.kwtsms.com) SMS gateway API. Zero dependencies. Send SMS, check balance, validate numbers, and more.
 
 ## About kwtSMS
