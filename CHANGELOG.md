@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.1] - 2026-03-06
+
+### Fixed
+- CI: relax static analysis to warnings-only (info-level file_names lint on numbered examples)
+- CI: bump actions/checkout to v6
+- Rename `docs/` to `doc/` per pub.dev layout convention
+- Add SECURITY.md
+- Configure GitHub Actions OIDC for automated pub.dev publishing
+
 ## [0.1.0] - 2026-03-06
 
 ### Added
