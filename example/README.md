@@ -7,8 +7,8 @@ Runnable examples for the kwtsms Dart client library.
 All examples that send SMS require credentials. Create a `.env` file:
 
 ```ini
-KWTSMS_USERNAME=your_api_user
-KWTSMS_PASSWORD=your_api_pass
+KWTSMS_USERNAME=dart_username
+KWTSMS_PASSWORD=dart_password
 KWTSMS_SENDER_ID=KWT-SMS
 KWTSMS_TEST_MODE=1
 ```

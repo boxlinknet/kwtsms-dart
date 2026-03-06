@@ -55,7 +55,7 @@ flutter pub add kwtsms
 import 'package:kwtsms/kwtsms.dart';
 
 void main() async {
-  final sms = KwtSMS('your_api_user', 'your_api_pass');
+  final sms = KwtSMS('dart_username', 'dart_password');
 
   // Verify credentials
   final verify = await sms.verify();
@@ -72,8 +72,8 @@ void main() async {
 ### Option 1: Environment variables
 
 ```bash
-export KWTSMS_USERNAME=your_api_user
-export KWTSMS_PASSWORD=your_api_pass
+export KWTSMS_USERNAME=dart_username
+export KWTSMS_PASSWORD=dart_password
 export KWTSMS_SENDER_ID=YOUR-SENDERID
 export KWTSMS_TEST_MODE=0
 export KWTSMS_LOG_FILE=kwtsms.log
@@ -88,8 +88,8 @@ final sms = KwtSMS.fromEnv();
 Create a `.env` file in your project root:
 
 ```ini
-KWTSMS_USERNAME=your_api_user
-KWTSMS_PASSWORD=your_api_pass
+KWTSMS_USERNAME=dart_username
+KWTSMS_PASSWORD=dart_password
 KWTSMS_SENDER_ID=YOUR-SENDERID
 KWTSMS_TEST_MODE=1
 KWTSMS_LOG_FILE=kwtsms.log
@@ -103,8 +103,8 @@ final sms = KwtSMS.fromEnv(); // reads .env automatically
 
 ```dart
 final sms = KwtSMS(
-  'your_api_user',
-  'your_api_pass',
+  'dart_username',
+  'dart_password',
   senderId: 'YOUR-SENDERID',
   testMode: true,
   logFile: 'kwtsms.log',
