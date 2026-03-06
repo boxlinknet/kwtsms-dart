@@ -501,10 +501,13 @@ Save the `msg-id` from the send response, then call `sms.status(msgId)`. For int
 
 ## Help & Support
 
-- **kwtSMS Support center:** https://www.kwtsms.com/support.html
-- **API documentation (PDF):** https://www.kwtsms.com/doc/KwtSMS.com_API_Documentation_v41.pdf
-- **FAQ:** https://www.kwtsms.com/faq/
-- **Library issues:** https://github.com/boxlinknet/kwtsms-dart/issues
+- **[kwtSMS FAQ](https://www.kwtsms.com/faq/)** — Answers to common questions about credits, sender IDs, OTP, and delivery
+- **[kwtSMS Support](https://www.kwtsms.com/support.html)** — Open a support ticket or browse help articles
+- **[Contact kwtSMS](https://www.kwtsms.com/#contact)** — Reach the kwtSMS team directly for Sender ID registration and account issues
+- **[API Documentation (PDF)](https://www.kwtsms.com/doc/KwtSMS.com_API_Documentation_v41.pdf)** — kwtSMS REST API v4.1 full reference
+- **[kwtSMS Dashboard](https://www.kwtsms.com/login/)** — Recharge credits, buy Sender IDs, view message logs, manage coverage
+- **[Other Integrations](https://www.kwtsms.com/integrations.html)** — Plugins and integrations for other platforms and languages
+- **[Library Issues](https://github.com/boxlinknet/kwtsms-dart/issues)** — Report bugs or request features for this Dart client
 
 ## License
 
