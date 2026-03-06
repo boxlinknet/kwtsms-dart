@@ -19,7 +19,7 @@ pubspec.lock
 .env
 *.log
 
-# Claude Code (session data, project memory)
+# AI tooling (session data, project memory)
 .claude/
 
 # Internal docs (PRD, design docs — not part of the published package)
