@@ -170,7 +170,7 @@ final result3 = await sms.send(
 ```
 
 **What happens automatically:**
-- Phone numbers are normalized (strips +, 00, spaces, dashes, converts Arabic digits)
+- Phone numbers are normalized (strips +, 00, spaces, dashes, converts Arabic digits ٠١٢٣٤٥٦٧٨٩)
 - Numbers are deduplicated after normalization
 - Invalid numbers are collected in `result.invalid` without crashing
 - Message text is cleaned (emojis stripped, HTML removed, control chars removed)
@@ -277,7 +277,7 @@ normalizePhone('+96598765432');     // '96598765432'
 normalizePhone('0096598765432');    // '96598765432'
 normalizePhone('965 9876 5432');    // '96598765432'
 normalizePhone('965-9876-5432');    // '96598765432'
-normalizePhone('\u0669\u0666\u0665...');  // Arabic digits converted
+normalizePhone('٩٦٥٩٨٧٦٥٤٣٢');         // '96598765432' (Arabic digits converted)
 ```
 
 ### validatePhoneInput(phone)
@@ -299,7 +299,7 @@ final (v3, e3, n3) = validatePhoneInput('user@example.com');
 cleanMessage('Hello \u{1F600}');  // 'Hello ' (emoji stripped)
 cleanMessage('<b>Bold</b>');      // 'Bold' (HTML stripped)
 cleanMessage('\uFEFFHello');      // 'Hello' (BOM stripped)
-cleanMessage('\u0661\u0662\u0663'); // '123' (Arabic digits converted)
+cleanMessage('رمز التحقق: ١٢٣٤٥٦'); // 'رمز التحقق: 123456' (Arabic digits converted)
 ```
 
 ### enrichError(response)
@@ -403,7 +403,7 @@ for (final entry in result.invalid) {
 | `0096598765432` | `96598765432` | Yes (00 stripped) |
 | `965 9876 5432` | `96598765432` | Yes (spaces stripped) |
 | `965-9876-5432` | `96598765432` | Yes (dashes stripped) |
-| Arabic digits | `96598765432` | Yes (converted to Latin) |
+| `٩٦٥٩٨٧٦٥٤٣٢` (Arabic digits) | `96598765432` | Yes (converted to Latin) |
 | `123456` | `123456` | No (too short, min 7 digits) |
 | `user@example.com` | -- | No (email address) |
 | `abcdef` | -- | No (no digits) |
@@ -456,9 +456,9 @@ Dart is single-threaded (event loop). No mutex is needed for cached balance in s
 
 ## What's Handled Automatically
 
-- Phone number normalization (strips +, 00, spaces, dashes, converts Arabic digits)
+- Phone number normalization (strips +, 00, spaces, dashes, converts Arabic digits ٠١٢٣٤٥٦٧٨٩)
 - Phone number deduplication after normalization
-- Message cleaning (emojis, HTML tags, control characters, Arabic digit conversion)
+- Message cleaning (emojis, HTML tags, control characters, Arabic digit ٠١٢٣٤٥٦٧٨٩ conversion)
 - Bulk batching (>200 numbers split into batches of 200 with 0.5s delay)
 - ERR013 retry with exponential backoff (30s, 60s, 120s)
 - Balance caching after verify/send
