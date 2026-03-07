@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          # Extract the section for this version from CHANGELOG.md
+          version="${{ steps.version.outputs.version }}"
+          # Get everything between this version header and the next version header
+          changelog=$(awk "/^## \\[$version\\]/{found=1; next} /^## \\[/{if(found) exit} found{print}" CHANGELOG.md)
+          # If no changelog found, use a default message
+          if [ -z "$changelog" ]; then
+            changelog="Release v$version"
+          fi
+          # Write to file to preserve newlines
+          echo "$changelog" > /tmp/changelog.txt
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --notes-file /tmp/changelog.txt
