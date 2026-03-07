@@ -9,7 +9,38 @@ permissions:
   contents: write
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Check version consistency
+        run: |
+          tag_version="${GITHUB_REF#refs/tags/v}"
+          pub_version=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          if [ "$tag_version" != "$pub_version" ]; then
+            echo "::error::Tag version ($tag_version) does not match pubspec.yaml version ($pub_version)"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Analyze
+        run: dart analyze
+
+      - name: Run tests
+        run: dart test --exclude-tags=integration
+
   release:
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -21,15 +52,11 @@ jobs:
       - name: Extract changelog for this version
         id: changelog
         run: |
-          # Extract the section for this version from CHANGELOG.md
           version="${{ steps.version.outputs.version }}"
-          # Get everything between this version header and the next version header
           changelog=$(awk "/^## \\[$version\\]/{found=1; next} /^## \\[/{if(found) exit} found{print}" CHANGELOG.md)
-          # If no changelog found, use a default message
           if [ -z "$changelog" ]; then
             changelog="Release v$version"
           fi
-          # Write to file to preserve newlines
           echo "$changelog" > /tmp/changelog.txt
 
       - name: Create GitHub Release
