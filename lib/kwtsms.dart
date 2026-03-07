@@ -22,3 +22,4 @@ export 'src/phone.dart'
     show normalizePhone, validatePhoneInput, deduplicatePhones, InvalidEntry;
 export 'src/message.dart' show cleanMessage;
 export 'src/env.dart' show loadEnvFile;
+export 'src/request.dart' show apiRequest;

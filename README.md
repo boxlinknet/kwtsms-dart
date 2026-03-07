@@ -7,7 +7,7 @@
 [![Dart 3](https://img.shields.io/badge/dart-%3E%3D3.0-blue.svg)](https://dart.dev)
 [![pub points](https://img.shields.io/pub/points/kwtsms)](https://pub.dev/packages/kwtsms/score)
 
-Official Dart/Flutter client for the [kwtSMS](https://www.kwtsms.com) SMS gateway API. Zero dependencies. Send SMS, check balance, validate numbers, and more.
+Dart/Flutter client for the [kwtSMS API](https://www.kwtsms.com). Send SMS, check balance, validate numbers, list sender IDs, check coverage, get delivery reports.
 
 ## About kwtSMS
 
@@ -15,7 +15,7 @@ kwtSMS is a Kuwaiti SMS gateway trusted by top businesses to deliver messages an
 
 ## Prerequisites
 
-You need **Dart** (3.0 or newer) installed. If you use Flutter, Dart is included.
+You need **Dart** (3.0 or newer) installed. If you use Flutter, Dart is included. Zero runtime dependencies.
 
 ### Option A: Dart only (server-side / CLI)
 
@@ -110,6 +110,28 @@ final sms = KwtSMS(
   logFile: 'kwtsms.log',
 );
 ```
+
+## Credential Management
+
+**Never hardcode credentials.** Use one of these approaches:
+
+1. **Environment variables / .env file** (default): `KwtSMS.fromEnv()` loads from env vars, then `.env` file. The file is `.gitignore`d and editable without redeployment.
+
+2. **Constructor injection**: `KwtSMS(username, password, ...)` for custom config systems, DI containers, or remote config.
+
+3. **Secrets manager**: Load from AWS Secrets Manager, HashiCorp Vault, Google Secret Manager, or your own config API, then pass to the constructor.
+
+4. **Admin settings UI** (for web apps): Store credentials in your database with a settings page. Include a "Test Connection" button that calls `verify()`.
+
+### Additional requirements for mobile apps (Flutter)
+
+**Backend proxy (strongly recommended):** The mobile app calls YOUR backend server, which holds the kwtSMS credentials and makes the API call. The app never touches the SMS API directly. This is the only pattern that fully protects credentials.
+
+**If calling the API directly (not recommended):** Store credentials using `flutter_secure_storage` and provide a settings screen for entering/updating them. NEVER store credentials in assets, hardcoded strings, or environment files bundled with the app.
+
+### Thread Safety
+
+Dart is single-threaded (event loop). No mutex is needed for cached balance in standard use. If using Isolates, create a separate `KwtSMS` instance per Isolate.
 
 ## All Methods
 
@@ -328,18 +350,226 @@ final vars = loadEnvFile('.env');
 print(vars['KWTSMS_USERNAME']);
 ```
 
+## Input Sanitization
+
+`cleanMessage()` is called automatically by `send()` before every API call. It prevents the #1 cause of "message sent but not received" support tickets:
+
+| Content | Effect without cleaning | What cleanMessage() does |
+|---------|------------------------|--------------------------|
+| Emojis | Stuck in queue, credits wasted, no error | Stripped |
+| Hidden control characters (BOM, zero-width space, soft hyphen) | Spam filter rejection or queue stuck | Stripped |
+| Arabic/Hindi numerals in body | OTP codes render inconsistently | Converted to Latin digits |
+| HTML tags | ERR027, message rejected | Stripped |
+| Directional marks (LTR, RTL) | May cause display issues | Stripped |
+
+Arabic letters and Arabic text are fully supported and never stripped.
+
+## Error Handling
+
+Every ERROR response includes an `action` field with a developer-friendly fix:
+
+```dart
+final result = await sms.send('96598765432', 'Hello');
+
+if (result.result == 'OK') {
+  // Save msg-id and balance-after
+  db.save('sms_balance', result.balanceAfter);
+  db.save('msg_id', result.msgId);
+} else {
+  // Error handling
+  print('Code: ${result.code}');
+  print('Description: ${result.description}');
+  print('Action: ${result.action}'); // developer-friendly guidance
+}
+
+// Invalid numbers are collected, never crash the call
+for (final entry in result.invalid) {
+  print('${entry.input}: ${entry.error}');
+}
+```
+
+### User-facing error mapping
+
+Raw API errors should never be shown to end users. Map them:
+
+| Situation | API error | Show to user |
+|-----------|----------|--------------|
+| Invalid phone number | ERR006, ERR025 | "Please enter a valid phone number in international format (e.g., +965 9876 5432)." |
+| Wrong credentials | ERR003 | "SMS service is temporarily unavailable. Please try again later." (log + alert admin) |
+| No balance | ERR010, ERR011 | "SMS service is temporarily unavailable. Please try again later." (alert admin) |
+| Country not supported | ERR026 | "SMS delivery to this country is not available." |
+| Rate limited | ERR028 | "Please wait a moment before requesting another code." |
+| Message rejected | ERR031, ERR032 | "Your message could not be sent. Please try again with different content." |
+| Queue full | ERR013 | "SMS service is busy. Please try again in a few minutes." (library retries automatically) |
+| Network error | Connection timeout | "Could not connect to SMS service." |
+
+### Common Error Codes
+
+| Code | Meaning | Action |
+|------|---------|--------|
+| ERR003 | Wrong credentials | Check KWTSMS_USERNAME and KWTSMS_PASSWORD |
+| ERR006 | No valid phone numbers | Include country code (e.g., 96598765432) |
+| ERR008 | Sender ID banned | Use a different sender ID |
+| ERR009 | Empty message | Provide a non-empty message |
+| ERR010 | Zero balance | Recharge at kwtsms.com |
+| ERR011 | Insufficient balance | Buy more credits |
+| ERR013 | Queue full | Retried automatically (3x with backoff) |
+| ERR024 | IP not whitelisted | Add IP at kwtsms.com > API > IP Lockdown |
+| ERR025 | Invalid phone number | Include the country code |
+| ERR026 | Country not activated | Contact kwtSMS support |
+| ERR028 | 15-second rate limit | Wait before resending to same number |
+
+## Phone Number Formats
+
+All formats are accepted and normalized automatically:
+
+| Input | Normalized | Valid? |
+|-------|-----------|--------|
+| `96598765432` | `96598765432` | Yes |
+| `+96598765432` | `96598765432` | Yes |
+| `0096598765432` | `96598765432` | Yes |
+| `965 9876 5432` | `96598765432` | Yes |
+| `965-9876-5432` | `96598765432` | Yes |
+| `(965) 98765432` | `96598765432` | Yes |
+| `٩٦٥٩٨٧٦٥٤٣٢` | `96598765432` | Yes |
+| `۹۶۵۹۸۷۶۵۴۳۲` | `96598765432` | Yes |
+| `+٩٦٥٩٨٧٦٥٤٣٢` | `96598765432` | Yes |
+| `٠٠٩٦٥٩٨٧٦٥٤٣٢` | `96598765432` | Yes |
+| `٩٦٥ ٩٨٧٦ ٥٤٣٢` | `96598765432` | Yes |
+| `٩٦٥-٩٨٧٦-٥٤٣٢` | `96598765432` | Yes |
+| `965٩٨٧٦٥٤٣٢` | `96598765432` | Yes |
+| `123456` (too short) | rejected | No |
+| `user@gmail.com` | rejected | No |
+
+## Test Mode
+
+**Test mode** (`KWTSMS_TEST_MODE=1`) sends your message to the kwtSMS queue but does NOT deliver it to the handset. No SMS credits are consumed. Use this during development.
+
+**Live mode** (`KWTSMS_TEST_MODE=0`) delivers the message for real and deducts credits. Always develop in test mode and switch to live only when ready for production.
+
+```dart
+final sms = KwtSMS('user', 'pass', testMode: true);
+final result = await sms.send('96598765432', 'Test message');
+// Message is queued but NOT delivered. No credits consumed.
+```
+
+Test messages appear in the Sending Queue at kwtsms.com. Delete them from the queue to recover any tentatively held credits. Remember to set `testMode: false` before going live.
+
+## Sender ID
+
+A **Sender ID** is the name that appears as the sender on the recipient's phone (e.g., "MY-APP" instead of a random number).
+
+| | Promotional | Transactional |
+|--|-------------|---------------|
+| **Use for** | Bulk SMS, marketing, offers | OTP, alerts, notifications |
+| **Delivery to DND numbers** | Blocked/filtered, credits lost | Bypasses DND (whitelisted) |
+| **Speed** | May have delays | Priority delivery |
+| **Cost** | 10 KD one-time | 15 KD one-time |
+
+`KWT-SMS` is a shared test sender. It causes delivery delays, is blocked on Virgin Kuwait, and should never be used in production. Register your own private Sender ID through your kwtSMS account. For OTP/authentication messages, you need a **Transactional** Sender ID to bypass DND filtering. Sender ID is **case sensitive**.
+
+## Timestamps
+
+`unix-timestamp` values in API responses are in **GMT+3 (Asia/Kuwait)** server time, not UTC. Convert when storing or displaying.
+
+## Best Practices
+
+### Always save msg-id and balance-after
+
+```dart
+final result = await sms.send(phone, message);
+if (result.result == 'OK') {
+  db.save('sms_msg_id', result.msgId);         // needed for status/DLR
+  db.save('sms_balance', result.balanceAfter);  // no extra API call needed
+}
+```
+
+### Validate locally before calling the API
+
+```dart
+final (valid, error, normalized) = validatePhoneInput(userInput);
+if (!valid) {
+  return {'error': error};  // rejected locally, no API call
+}
+```
+
+### Country coverage pre-check
+
+Call `coverage()` once at startup and cache the active prefixes. Before every send, check if the number's country prefix is in the list. If not, return an error immediately without hitting the API.
+
+```dart
+// At startup
+final coverage = await sms.coverage();
+final activePrefixes = coverage.prefixes;
+
+// Before send
+if (!activePrefixes.any((p) => normalized.startsWith(p))) {
+  return {'error': 'SMS delivery to this country is not available.'};
+}
+```
+
+### OTP requirements
+
+- Always include app/company name: `"Your OTP for APPNAME is: 123456"`
+- Resend timer: minimum 3-4 minutes (KNET standard is 4 minutes)
+- OTP expiry: 3-5 minutes
+- New code on resend: always generate a fresh code, invalidate previous
+- Use Transactional Sender ID for OTP (not Promotional, not KWT-SMS)
+- One number per OTP request: never batch OTP sends
+
+## Implementation Checklist
+
+Before going live, verify you have implemented these correctly:
+
+- [ ] Validate phone numbers locally before calling the API (reject emails, too-short, too-long)
+- [ ] Clean message text before sending (emojis, HTML, hidden characters)
+- [ ] Check country coverage before sending (cache prefixes from `coverage()`)
+- [ ] Save `msg-id` from every successful send (needed for status/DLR)
+- [ ] Save `balance-after` from every successful send (never call `balance()` after `send()`)
+- [ ] Map raw API errors to user-facing messages (never expose ERR codes to users)
+- [ ] Log errors with full details for admin review
+- [ ] Set up low-balance alerts
+- [ ] Handle ERR028 (15-second same-number rate limit) in your UI
+- [ ] Use Transactional Sender ID for OTP (not Promotional)
+
+## Security Checklist
+
+Before going live:
+
+- [ ] Bot protection enabled (Device Attestation for mobile, CAPTCHA for web)
+- [ ] Rate limit per phone number (max 3-5 OTP/hour)
+- [ ] Rate limit per IP address (max 10-20/hour)
+- [ ] Rate limit per user/session if authenticated
+- [ ] Monitoring/alerting on abuse patterns
+- [ ] Admin notification on low balance
+- [ ] Test mode OFF (`KWTSMS_TEST_MODE=0`)
+- [ ] Private Sender ID registered (not KWT-SMS)
+- [ ] Transactional Sender ID for OTP (not promotional)
+
+## What's Handled Automatically
+
+- **Phone normalization**: `+`, `00`, spaces, dashes, dots, parentheses stripped. Arabic-Indic digits converted. Leading zeros removed.
+- **Duplicate phone removal**: If the same number appears multiple times (in different formats), it is sent only once.
+- **Message cleaning**: Emojis removed (codepoint-safe). Hidden control characters (BOM, zero-width spaces, directional marks) removed. HTML tags stripped. Arabic-Indic digits in message body converted to Latin.
+- **Batch splitting**: More than 200 numbers are automatically split into batches of 200 with 0.5s delay between batches.
+- **ERR013 retry**: Queue-full errors are automatically retried up to 3 times with exponential backoff (30s / 60s / 120s).
+- **Error enrichment**: Every API error response includes an `action` field with a developer-friendly fix hint.
+- **Credential masking**: Passwords are always masked as `***` in log files. Never exposed.
+- **Balance caching**: Balance is cached from every `verify()` and `send()` response. `balance()` falls back to the cached value on API failure.
+
 ## Examples
 
-See the [example/](example/) directory for runnable code:
+See the [example/](example/) directory:
 
-| Example | Description |
-|---------|-------------|
-| [01_basic_usage](example/01_basic_usage.dart) | Load credentials, verify, send SMS, print result |
-| [02_otp_flow](example/02_otp_flow.dart) | Generate OTP, validate phone, send, save msg-id |
-| [03_bulk_sms](example/03_bulk_sms.dart) | Send to multiple numbers with mixed formats |
-| [04_shelf_endpoint](example/04_shelf_endpoint.dart) | Shelf HTTP endpoint for sending SMS with validation |
-| [05_error_handling](example/05_error_handling.dart) | Handle all error types with user-facing messages |
-| [06_otp_production](example/06_otp_production/) | Production OTP service: rate limiting, hashing, device attestation, resend cooldown |
+| # | Example | Description |
+|---|---------|-------------|
+| 00 | [Raw API](example/00_raw_api.dart) | Call every kwtSMS endpoint directly, no library, just dart:io ([docs](example/00_raw_api.md)) |
+| 01 | [Basic Usage](example/01_basic_usage.dart) | Load credentials, verify, send SMS, print result |
+| 02 | [OTP Flow](example/02_otp_flow.dart) | Generate OTP, validate phone, send, save msg-id |
+| 03 | [Bulk SMS](example/03_bulk_sms.dart) | Send to multiple numbers with mixed formats |
+| 04 | [Shelf Endpoint](example/04_shelf_endpoint.dart) | Shelf HTTP endpoint for sending SMS with validation |
+| 05 | [Error Handling](example/05_error_handling.dart) | Handle all error types with user-facing messages |
+| 06 | [OTP Production](example/06_otp_production/) | Production OTP service: rate limiting, hashing, device attestation, resend cooldown |
 
 ## CLI Usage
 
@@ -367,139 +597,11 @@ kwtsms help                                           # show help
 kwtsms version                                        # show version
 ```
 
-## Error Handling
-
-Every API method returns a typed result object. Errors never crash your application.
-
-```dart
-final result = await sms.send('96598765432', 'Hello');
-
-if (result.result == 'OK') {
-  // Save msg-id and balance-after
-  db.save('sms_balance', result.balanceAfter);
-  db.save('msg_id', result.msgId);
-} else {
-  // Error handling
-  print('Code: ${result.code}');
-  print('Description: ${result.description}');
-  print('Action: ${result.action}'); // developer-friendly guidance
-}
-
-// Invalid numbers are collected, never crash the call
-for (final entry in result.invalid) {
-  print('${entry.input}: ${entry.error}');
-}
-```
-
-### Common Error Codes
-
-| Code | Meaning | Action |
-|------|---------|--------|
-| ERR003 | Wrong credentials | Check KWTSMS_USERNAME and KWTSMS_PASSWORD |
-| ERR006 | No valid phone numbers | Include country code (e.g., 96598765432) |
-| ERR008 | Sender ID banned | Use a different sender ID |
-| ERR009 | Empty message | Provide a non-empty message |
-| ERR010 | Zero balance | Recharge at kwtsms.com |
-| ERR011 | Insufficient balance | Buy more credits |
-| ERR013 | Queue full | Retried automatically (3x with backoff) |
-| ERR024 | IP not whitelisted | Add IP at kwtsms.com > API > IP Lockdown |
-| ERR025 | Invalid phone number | Include the country code |
-| ERR026 | Country not activated | Contact kwtSMS support |
-| ERR028 | 15-second rate limit | Wait before resending to same number |
-
-## Phone Number Formats
-
-| Input | Normalized | Valid? |
-|-------|-----------|--------|
-| `96598765432` | `96598765432` | Yes |
-| `+96598765432` | `96598765432` | Yes (+ stripped) |
-| `0096598765432` | `96598765432` | Yes (00 stripped) |
-| `965 9876 5432` | `96598765432` | Yes (spaces stripped) |
-| `965-9876-5432` | `96598765432` | Yes (dashes stripped) |
-| `٩٦٥٩٨٧٦٥٤٣٢` (Arabic digits) | `96598765432` | Yes (converted to Latin) |
-| `123456` | `123456` | No (too short, min 7 digits) |
-| `user@example.com` | -- | No (email address) |
-| `abcdef` | -- | No (no digits) |
-
-## Test Mode
-
-Set `testMode: true` or `KWTSMS_TEST_MODE=1` to queue messages without delivering them.
-
-```dart
-final sms = KwtSMS('user', 'pass', testMode: true);
-final result = await sms.send('96598765432', 'Test message');
-// Message is queued but NOT delivered. No credits consumed.
-```
-
-Test messages appear in the Sending Queue at kwtsms.com. Delete them from the queue to recover any tentatively held credits. Remember to set `testMode: false` before going live.
-
-## Sender ID
-
-`KWT-SMS` is a shared test sender ID. It may cause delays, is blocked on Virgin Kuwait numbers, and must never be used in production.
-
-Register a private sender ID on your kwtSMS account before going live:
-
-| Type | Use for | DND delivery | Cost |
-|------|---------|-------------|------|
-| **Promotional** | Bulk SMS, marketing, offers | Blocked on DND numbers | 10 KD |
-| **Transactional** | OTP, alerts, notifications | Bypasses DND (whitelisted) | 15 KD |
-
-**For OTP/authentication, you MUST use a Transactional Sender ID.** Using Promotional means messages to DND numbers are silently blocked and credits are still deducted.
-
-Sender ID is **case sensitive**: `Kuwait` is not the same as `KUWAIT`.
-
-## For Mobile Apps (Flutter)
-
-### Credential Management
-
-**Backend proxy (strongly recommended):** The mobile app calls YOUR backend server, which holds the kwtSMS credentials and makes the API call. The app never touches the SMS API directly. This is the only pattern that fully protects credentials.
-
-**If calling the API directly (not recommended):** Store credentials using `flutter_secure_storage` and provide a settings screen for entering/updating them. NEVER store credentials in assets, hardcoded strings, or environment files bundled with the app.
-
-### Bot Protection
-
-Mobile apps do not need CAPTCHA. Use device attestation instead:
-
-- **iOS:** Apple App Attest via `DCAppAttestService`
-- **Android:** Google Play Integrity API
-
-### Thread Safety
-
-Dart is single-threaded (event loop). No mutex is needed for cached balance in standard use. If using Isolates, create a separate `KwtSMS` instance per Isolate.
-
-## What's Handled Automatically
-
-- Phone number normalization (strips +, 00, spaces, dashes, converts Arabic digits ٠١٢٣٤٥٦٧٨٩)
-- Phone number deduplication after normalization
-- Message cleaning (emojis, HTML tags, control characters, Arabic digit ٠١٢٣٤٥٦٧٨٩ conversion)
-- Bulk batching (>200 numbers split into batches of 200 with 0.5s delay)
-- ERR013 retry with exponential backoff (30s, 60s, 120s)
-- Balance caching after verify/send
-- JSONL logging with credential masking
-- Invalid number collection (never crashes, collects in `.invalid`)
-- Error enrichment with developer-friendly action messages
-
-## Security Checklist
-
-Before going live, verify:
-
-```
-[ ] Bot protection enabled (Device Attestation for mobile, CAPTCHA for web)
-[ ] Rate limit per phone number (max 3-5 OTP/hour)
-[ ] Rate limit per IP address (max 10-20/hour)
-[ ] Rate limit per user/session if authenticated
-[ ] Monitoring/alerting on abuse patterns
-[ ] Admin notification on low balance
-[ ] Test mode OFF (KWTSMS_TEST_MODE=0)
-[ ] Private Sender ID registered (not KWT-SMS)
-[ ] Transactional Sender ID for OTP (not promotional)
-```
-
 ## FAQ
 
 **1. My message was sent successfully (result: OK) but the recipient didn't receive it. What happened?**
 
-Check the **Sending Queue** at [kwtsms.com](https://www.kwtsms.com/login/). If your message is stuck there, it was accepted by the API but not dispatched. Common causes are emoji in the message, hidden characters from copy-pasting, or spam filter triggers. Delete it from the queue to recover your credits. Also verify that test mode is off (`KWTSMS_TEST_MODE=0`). Test messages are queued but never delivered.
+Check the **Sending Queue** at [kwtsms.com](https://www.kwtsms.com/login/). If your message is stuck there, it was accepted by the API but not dispatched. Common causes are emoji in the message, hidden characters from copy-pasting, or spam filter triggers. Delete it from the queue to recover your credits. Also verify that `test` mode is off (`KWTSMS_TEST_MODE=0`). Test messages are queued but never delivered.
 
 **2. What is the difference between Test mode and Live mode?**
 
@@ -511,11 +613,11 @@ A **Sender ID** is the name that appears as the sender on the recipient's phone 
 
 **4. I'm getting ERR003 "Authentication error". What's wrong?**
 
-You are using the wrong credentials. The API requires your **API username and API password**, NOT your account mobile number. Log in to [kwtsms.com](https://www.kwtsms.com/login/), go to Account > API settings, and check your API credentials. Also make sure you are using POST (not GET) and `Content-Type: application/json`.
+You are using the wrong credentials. The API requires your **API username and API password**, NOT your account mobile number. Log in to [kwtsms.com](https://www.kwtsms.com/login/), go to Account, and check your API credentials. Also make sure you are using POST (not GET) and `Content-Type: application/json`.
 
 **5. Can I send to international numbers (outside Kuwait)?**
 
-International sending is **disabled by default** on kwtSMS accounts. Contact kwtSMS support to request activation for specific country prefixes. Use `sms.coverage()` to check which countries are currently active on your account. Be aware that activating international coverage increases exposure to automated abuse. Implement rate limiting and CAPTCHA before enabling.
+International sending is **disabled by default** on kwtSMS accounts. [Log in to your kwtSMS account](https://www.kwtsms.com/login/) and add coverage for the country prefixes you need. Use `coverage()` to check which countries are currently active on your account. Be aware that activating international coverage increases exposure to automated abuse. Implement rate limiting and CAPTCHA before enabling.
 
 **6. Can I use this with Flutter?**
 
@@ -527,13 +629,16 @@ Save the `msg-id` from the send response, then call `sms.status(msgId)`. For int
 
 ## Help & Support
 
-- **[kwtSMS FAQ](https://www.kwtsms.com/faq/)** — Answers to common questions about credits, sender IDs, OTP, and delivery
-- **[kwtSMS Support](https://www.kwtsms.com/support.html)** — Open a support ticket or browse help articles
-- **[Contact kwtSMS](https://www.kwtsms.com/#contact)** — Reach the kwtSMS team directly for Sender ID registration and account issues
-- **[API Documentation (PDF)](https://www.kwtsms.com/doc/KwtSMS.com_API_Documentation_v41.pdf)** — kwtSMS REST API v4.1 full reference
-- **[kwtSMS Dashboard](https://www.kwtsms.com/login/)** — Recharge credits, buy Sender IDs, view message logs, manage coverage
-- **[Other Integrations](https://www.kwtsms.com/integrations.html)** — Plugins and integrations for other platforms and languages
-- **[Library Issues](https://github.com/boxlinknet/kwtsms-dart/issues)** — Report bugs or request features for this Dart client
+- **[kwtSMS FAQ](https://www.kwtsms.com/faq/)**: Answers to common questions about credits, sender IDs, OTP, and delivery
+- **[kwtSMS Support](https://www.kwtsms.com/support.html)**: Open a support ticket or browse help articles
+- **[Contact kwtSMS](https://www.kwtsms.com/#contact)**: Reach the kwtSMS team directly for Sender ID registration and account issues
+- **[API Documentation (PDF)](https://www.kwtsms.com/doc/KwtSMS.com_API_Documentation_v41.pdf)**: kwtSMS REST API v4.1 full reference
+- **[Best Practices](https://www.kwtsms.com/articles/sms-api-implementation-best-practices.html)**: SMS API implementation best practices
+- **[Integration Test Checklist](https://www.kwtsms.com/articles/sms-api-integration-test-checklist.html)**: Pre-launch testing checklist
+- **[Sender ID Help](https://www.kwtsms.com/sender-id-help.html)**: Guide to registering and managing Sender IDs
+- **[kwtSMS Dashboard](https://www.kwtsms.com/login/)**: Recharge credits, buy Sender IDs, view message logs, manage coverage
+- **[Other Integrations](https://www.kwtsms.com/integrations.html)**: Plugins and integrations for other platforms and languages
+- **[Library Issues](https://github.com/boxlinknet/kwtsms-dart/issues)**: Report bugs or request features for this Dart client
 
 ## License
 
