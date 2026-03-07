@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.1.9] - 2026-03-07
+
+### Added
+- Interactive setup wizard for CLI (hidden password, sender ID selection, test/live mode menu)
+- Raw API example (`example/00_raw_api.dart`) with step-by-step documentation
+- CLI tests (`test/cli_test.dart`) covering help, version, argument validation, and bulk send
+- Bulk send integration test (250 numbers, 2-batch verification, balance tracking)
+- Pre-test balance check with credit budget assertion in integration tests
+- Export `apiRequest` for direct API access
+- Input Sanitization, Best Practices, Implementation Checklist, Timestamps sections in README
+- User-facing error mapping table in README
+- Three new Help & Support links (Best Practices, Integration Test Checklist, Sender ID Help)
+
+### Changed
+- README rewritten to match kwtSMS client library standard (title, sections, structure)
+- Phone Number Formats table expanded with Persian digits, parentheses, Arabic prefix combos
+- FAQ consolidated with Rust/Java client libraries (7 questions)
+- Help & Support section updated with full link descriptions
+- Integration tests now track exact credit consumption per test
+
 ## [0.1.8] - 2026-03-06
 
 ### Fixed
