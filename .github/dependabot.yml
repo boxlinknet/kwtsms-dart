@@ -8,6 +8,10 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
+    groups:
+      actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: "pub"
     directory: "/"
@@ -17,3 +21,7 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
+    groups:
+      dart-deps:
+        patterns:
+          - "*"
