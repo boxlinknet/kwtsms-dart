@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.10] - 2026-03-07
+
+### Added
+- Auto-create GitHub Release from tag with changelog notes
+- Auto-approve and squash-merge Dependabot PRs after CI passes
+- Auto-close stale issues/PRs after 30+7 days of inactivity
+- Dependabot tracking for Dart pub dependencies
+
 ## [0.1.9] - 2026-03-07
 
 ### Added
