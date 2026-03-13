@@ -19,7 +19,16 @@ export 'src/client.dart'
         DeliveryReportResult;
 export 'src/errors.dart' show apiErrors, enrichError;
 export 'src/phone.dart'
-    show normalizePhone, validatePhoneInput, deduplicatePhones, InvalidEntry;
+    show
+        normalizePhone,
+        validatePhoneInput,
+        deduplicatePhones,
+        InvalidEntry,
+        PhoneRule,
+        phoneRules,
+        countryNames,
+        findCountryCode,
+        validatePhoneFormat;
 export 'src/message.dart' show cleanMessage;
 export 'src/env.dart' show loadEnvFile;
 export 'src/request.dart' show apiRequest;
