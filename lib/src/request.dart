@@ -35,8 +35,8 @@ Future<Map<String, dynamic>> apiRequest({
     request.add(body);
 
     final response = await request.close().timeout(
-      const Duration(seconds: 15),
-    );
+          const Duration(seconds: 15),
+        );
 
     responseBody = await response.transform(utf8.decoder).join();
     client.close(force: false);

@@ -21,16 +21,13 @@ const Map<String, String> apiErrors = {
   'ERR010': 'Account balance is zero. Recharge credits at kwtsms.com.',
   'ERR011':
       'Insufficient balance for this send. Buy more credits at kwtsms.com.',
-  'ERR012':
-      'Message is too long (over 6 SMS pages). Shorten your message.',
-  'ERR013':
-      'Send queue is full (1000 messages). Wait a moment and try again.',
+  'ERR012': 'Message is too long (over 6 SMS pages). Shorten your message.',
+  'ERR013': 'Send queue is full (1000 messages). Wait a moment and try again.',
   'ERR019': 'No delivery reports found for this message.',
   'ERR020':
       'Message ID does not exist. Make sure you saved the msg-id from the send response.',
   'ERR021': 'No delivery report available for this message yet.',
-  'ERR022':
-      'Delivery reports are not ready yet. Try again after 24 hours.',
+  'ERR022': 'Delivery reports are not ready yet. Try again after 24 hours.',
   'ERR023': 'Unknown delivery report error. Contact kwtSMS support.',
   'ERR024':
       'Your IP address is not in the API whitelist. Add it at kwtsms.com > Account > API > IP Lockdown, or disable IP lockdown.',

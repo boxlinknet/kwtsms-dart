@@ -68,7 +68,8 @@ String userMessage(SendResult result) {
 }
 
 /// Log the full error details for the ops team.
-void logAdminError(String operation, {String? code, String? desc, String? action}) {
+void logAdminError(String operation,
+    {String? code, String? desc, String? action}) {
   // In production, send this to your logging pipeline (Sentry, CloudWatch, etc.).
   stderr.writeln('[ADMIN] $operation failed:');
   stderr.writeln('  code:        $code');

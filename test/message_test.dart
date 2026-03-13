@@ -29,7 +29,8 @@ void main() {
     });
 
     test('preserves punctuation', () {
-      expect(cleanMessage('Hello, world! How are you?'), 'Hello, world! How are you?');
+      expect(cleanMessage('Hello, world! How are you?'),
+          'Hello, world! How are you?');
     });
 
     // Arabic digit conversion
@@ -150,8 +151,7 @@ void main() {
     });
 
     test('strips complex HTML', () {
-      expect(
-          cleanMessage('<div class="msg">Hello <span>World</span></div>'),
+      expect(cleanMessage('<div class="msg">Hello <span>World</span></div>'),
           'Hello World');
     });
 
@@ -161,15 +161,11 @@ void main() {
 
     // Combined scenarios
     test('handles Arabic text with emoji and HTML', () {
-      expect(
-          cleanMessage('<b>مرحبا</b> \u{1F600}'),
-          'مرحبا ');
+      expect(cleanMessage('<b>مرحبا</b> \u{1F600}'), 'مرحبا ');
     });
 
     test('handles BOM + Arabic digits + emoji', () {
-      expect(
-          cleanMessage('\uFEFF\u0661\u0662\u0663 \u{1F600}'),
-          '123 ');
+      expect(cleanMessage('\uFEFF\u0661\u0662\u0663 \u{1F600}'), '123 ');
     });
 
     test('emoji-only message becomes empty', () {

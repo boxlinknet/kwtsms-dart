@@ -10,9 +10,7 @@ List<String> _generateBulkNumbers(int count) {
   while (suffixes.length < count) {
     suffixes.add(rng.nextInt(10000));
   }
-  return suffixes
-      .map((s) => '9659922${s.toString().padLeft(4, '0')}')
-      .toList();
+  return suffixes.map((s) => '9659922${s.toString().padLeft(4, '0')}').toList();
 }
 
 void main() {

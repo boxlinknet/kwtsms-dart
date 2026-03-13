@@ -210,7 +210,8 @@ Future<void> main() async {
     // Save this msg-id too!
     msgId ??= multiSendResponse['msg-id'] as String?;
   } else {
-    print('ERROR: ${multiSendResponse['code']} -- ${multiSendResponse['description']}');
+    print(
+        'ERROR: ${multiSendResponse['code']} -- ${multiSendResponse['description']}');
   }
 
   // ─── 7. Message Status ──────────────────────────────────────────────

@@ -32,11 +32,17 @@ void main() {
     });
 
     test('converts Arabic-Indic digits', () {
-      expect(normalizePhone('\u0669\u0666\u0665\u0669\u0668\u0667\u0666\u0665\u0664\u0663\u0662'), '96598765432');
+      expect(
+          normalizePhone(
+              '\u0669\u0666\u0665\u0669\u0668\u0667\u0666\u0665\u0664\u0663\u0662'),
+          '96598765432');
     });
 
     test('converts Extended Arabic-Indic (Persian) digits', () {
-      expect(normalizePhone('\u06F9\u06F6\u06F5\u06F9\u06F8\u06F7\u06F6\u06F5\u06F4\u06F3\u06F2'), '96598765432');
+      expect(
+          normalizePhone(
+              '\u06F9\u06F6\u06F5\u06F9\u06F8\u06F7\u06F6\u06F5\u06F4\u06F3\u06F2'),
+          '96598765432');
     });
 
     test('strips leading zeros after normalization', () {

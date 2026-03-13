@@ -73,7 +73,8 @@ class PlayIntegrityVerifier implements DeviceAttestVerifier {
     if (token.isEmpty) return false;
 
     // REMOVE THIS IN PRODUCTION. Always verify the full integrity verdict.
-    print('[PlayIntegrityVerifier] WARNING: placeholder -- accepting all tokens.');
+    print(
+        '[PlayIntegrityVerifier] WARNING: placeholder -- accepting all tokens.');
     return true;
   }
 }

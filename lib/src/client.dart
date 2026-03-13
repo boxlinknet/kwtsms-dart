@@ -21,7 +21,8 @@ class VerifyResult {
       {'ok': ok, 'balance': balance, 'error': error};
 
   @override
-  String toString() => 'VerifyResult(ok: $ok, balance: $balance, error: $error)';
+  String toString() =>
+      'VerifyResult(ok: $ok, balance: $balance, error: $error)';
 }
 
 /// Result from [KwtSMS.send].
@@ -119,8 +120,7 @@ class BulkSendResult {
         'points-charged': pointsCharged,
         if (balanceAfter != null) 'balance-after': balanceAfter,
         'msg-ids': msgIds,
-        if (errors.isNotEmpty)
-          'errors': errors.map((e) => e.toJson()).toList(),
+        if (errors.isNotEmpty) 'errors': errors.map((e) => e.toJson()).toList(),
         if (invalid.isNotEmpty)
           'invalid': invalid.map((e) => e.toJson()).toList(),
       };
@@ -188,8 +188,7 @@ class SenderIdResult {
       };
 
   @override
-  String toString() =>
-      'SenderIdResult(result: $result, senderIds: $senderIds)';
+  String toString() => 'SenderIdResult(result: $result, senderIds: $senderIds)';
 }
 
 /// Result from [KwtSMS.coverage].
@@ -262,8 +261,7 @@ class DeliveryReportEntry {
   Map<String, dynamic> toJson() => {'number': number, 'status': status};
 
   @override
-  String toString() =>
-      'DeliveryReportEntry(number: $number, status: $status)';
+  String toString() => 'DeliveryReportEntry(number: $number, status: $status)';
 }
 
 /// Result from [KwtSMS.deliveryReport].
@@ -284,8 +282,7 @@ class DeliveryReportResult {
 
   Map<String, dynamic> toJson() => {
         'result': result,
-        if (report.isNotEmpty)
-          'report': report.map((e) => e.toJson()).toList(),
+        if (report.isNotEmpty) 'report': report.map((e) => e.toJson()).toList(),
         if (code != null) 'code': code,
         if (description != null) 'description': description,
         if (action != null) 'action': action,
@@ -460,7 +457,8 @@ class KwtSMS {
         numbers: bulkResult.numbers,
         pointsCharged: bulkResult.pointsCharged,
         balanceAfter: bulkResult.balanceAfter,
-        code: bulkResult.errors.isNotEmpty ? bulkResult.errors.first.code : null,
+        code:
+            bulkResult.errors.isNotEmpty ? bulkResult.errors.first.code : null,
         description: bulkResult.errors.isNotEmpty
             ? bulkResult.errors.first.description
             : null,
@@ -538,8 +536,8 @@ class KwtSMS {
       final enriched = enrichError(data);
       return ValidateResult(
         rejected: invalid,
-        error: enriched['action'] as String? ??
-            enriched['description'] as String?,
+        error:
+            enriched['action'] as String? ?? enriched['description'] as String?,
         raw: data,
       );
     } catch (e) {

@@ -355,7 +355,8 @@ class OtpService {
       saltB64 = existingSaltHash.split(':').first;
     } else {
       // Generate a new random salt.
-      final saltBytes = List<int>.generate(config.saltLength, (_) => _rng.nextInt(256));
+      final saltBytes =
+          List<int>.generate(config.saltLength, (_) => _rng.nextInt(256));
       saltB64 = base64Encode(saltBytes);
     }
 

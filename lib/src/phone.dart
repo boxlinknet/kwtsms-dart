@@ -30,9 +30,11 @@ String normalizePhone(dynamic phone) {
   var s = '$phone'.trim();
 
   // Convert Arabic-Indic digits (U+0660-U+0669)
-  const arabicDigits = '\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669';
+  const arabicDigits =
+      '\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669';
   // Convert Extended Arabic-Indic / Persian digits (U+06F0-U+06F9)
-  const persianDigits = '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
+  const persianDigits =
+      '\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9';
 
   final buf = StringBuffer();
   for (final rune in s.runes) {
