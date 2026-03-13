@@ -160,11 +160,11 @@ Future<void> main() async {
   //             "points-charged": 1, "balance-after": 149 }
   //
   // Important:
-  //   - Always POST (never GET — GET leaks credentials in server logs)
+  //   - Always POST (never GET: GET leaks credentials in server logs)
   //   - Always set Content-Type: application/json
   //   - Phone numbers must include the country code (e.g., 96598765432)
   //   - Multiple numbers: comma-separated, max 200 per request
-  //   - Save msg-id immediately — you need it for status/delivery reports
+  //   - Save msg-id immediately: you need it for status/delivery reports
   //   - "test": "1" queues the message but does NOT deliver it
 
   print('\n--- 5. Send SMS ---');
@@ -286,13 +286,13 @@ Future<void> main() async {
   print('Test mode:     "test": "1" in send body');
   print('');
   print('Endpoints:');
-  print('  POST /API/balance/   — Check credits');
-  print('  POST /API/senderid/  — List sender IDs');
-  print('  POST /API/coverage/  — List active country prefixes');
-  print('  POST /API/validate/  — Validate phone numbers');
-  print('  POST /API/send/      — Send SMS');
-  print('  POST /API/status/    — Check message delivery status');
-  print('  POST /API/dlr/       — Get delivery report (international only)');
+  print('  POST /API/balance/   : Check credits');
+  print('  POST /API/senderid/  : List sender IDs');
+  print('  POST /API/coverage/  : List active country prefixes');
+  print('  POST /API/validate/  : Validate phone numbers');
+  print('  POST /API/send/      : Send SMS');
+  print('  POST /API/status/    : Check message delivery status');
+  print('  POST /API/dlr/       : Get delivery report (international only)');
 
   print('\nDone.');
 }

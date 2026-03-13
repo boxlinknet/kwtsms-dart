@@ -18,7 +18,7 @@ void main() {
   final password = Platform.environment['DART_PASSWORD'] ?? '';
   final hasCredentials = username.isNotEmpty && password.isNotEmpty;
 
-  // Shared client instance — created once, reused across all tests.
+  // Shared client instance: created once, reused across all tests.
   // cachedBalance tracks the running balance as credits are consumed.
   late KwtSMS sms;
   late double startingBalance;

@@ -294,15 +294,25 @@ These are exported publicly and can be used independently.
 
 ### normalizePhone(phone)
 
+Strips non-digits, converts Arabic/Persian digits to Latin, removes leading zeros, and strips domestic trunk prefixes after the country code.
+
 ```dart
 normalizePhone('+96598765432');     // '96598765432'
 normalizePhone('0096598765432');    // '96598765432'
 normalizePhone('965 9876 5432');    // '96598765432'
 normalizePhone('965-9876-5432');    // '96598765432'
 normalizePhone('٩٦٥٩٨٧٦٥٤٣٢');         // '96598765432' (Arabic digits converted)
+
+// Trunk prefix stripping: removes the leading 0 after the country code
+normalizePhone('9660559876543');    // '966559876543' (Saudi 0 stripped)
+normalizePhone('+9660559876543');   // '966559876543'
+normalizePhone('9710501234567');    // '971501234567' (UAE 0 stripped)
+normalizePhone('20010123456789');   // '2010123456789' (Egypt 0 stripped)
 ```
 
 ### validatePhoneInput(phone)
+
+Validates a phone number input. Runs normalization, basic checks (empty, email, length), and country-specific format validation (local length + mobile prefix).
 
 ```dart
 final (valid, error, normalized) = validatePhoneInput('96598765432');
@@ -313,6 +323,65 @@ final (v2, e2, n2) = validatePhoneInput('123');
 
 final (v3, e3, n3) = validatePhoneInput('user@example.com');
 // (false, "'user@example.com' is an email address, not a phone number", '')
+
+// Country-specific validation
+final (v4, e4, n4) = validatePhoneInput('96512345678');
+// (false, "Invalid Kuwait mobile number: after +965 must start with 4, 5, 6, 9", '96512345678')
+
+final (v5, e5, n5) = validatePhoneInput('9651234567');
+// (false, "Invalid Kuwait number: expected 8 digits after +965, got 7", '9651234567')
+```
+
+### findCountryCode(normalized)
+
+Finds the country code prefix from a normalized phone number. Tries 3-digit, then 2-digit, then 1-digit (longest match wins).
+
+```dart
+findCountryCode('96598765432');   // '965' (Kuwait)
+findCountryCode('201012345678');  // '20'  (Egypt)
+findCountryCode('12025551234');   // '1'   (USA/Canada)
+findCountryCode('9991234567');    // null  (unknown)
+```
+
+### validatePhoneFormat(normalized)
+
+Validates a normalized phone number against country-specific rules: local number length and mobile starting digits. Numbers with no matching country rules pass through.
+
+```dart
+final (valid, error) = validatePhoneFormat('96598765432');
+// (true, null)
+
+final (v2, e2) = validatePhoneFormat('96512345678');
+// (false, "Invalid Kuwait mobile number: after +965 must start with 4, 5, 6, 9")
+```
+
+### phoneRules
+
+Map of 80+ countries with validation rules. Each entry has `localLengths` (valid digit counts after country code) and `mobileStartDigits` (valid first digits for mobile numbers).
+
+```dart
+phoneRules['965']; // PhoneRule(localLengths: [8], mobileStartDigits: ['4','5','6','9'])
+phoneRules['966']; // PhoneRule(localLengths: [9], mobileStartDigits: ['5'])
+phoneRules['1'];   // PhoneRule(localLengths: [10]) -- USA/Canada, no prefix check
+```
+
+### countryNames
+
+Map of country codes to human-readable country names. Used in error messages.
+
+```dart
+countryNames['965']; // 'Kuwait'
+countryNames['966']; // 'Saudi Arabia'
+countryNames['44'];  // 'UK'
+```
+
+### deduplicatePhones(phones)
+
+Removes duplicate phone numbers from a list while preserving order.
+
+```dart
+deduplicatePhones(['96598765432', '96512345678', '96598765432']);
+// ['96598765432', '96512345678']
 ```
 
 ### cleanMessage(text)

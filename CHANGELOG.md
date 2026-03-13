@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.12] - 2026-03-13
+
+### Added
+- Country-specific phone validation for 80+ countries (local length + mobile prefix rules)
+- `findCountryCode()`, `validatePhoneFormat()`, `phoneRules`, `countryNames`, `PhoneRule` exports
+- Trunk prefix stripping in `normalizePhone()`: 9660559... becomes 966559..., 97105x becomes 9715x
+- `deduplicatePhones()` documented in README
+- GitGuardian secrets scan workflow
+
+### Changed
+- `validatePhoneInput()` now validates against country-specific rules (length + mobile prefix)
+- README "Utility Functions" expanded to document all 13 public exports
+- Fixed em-dash usage in examples, tests, and docs (replaced with colons/commas)
+
 ## [0.1.11] - 2026-03-13
 
 ### Removed

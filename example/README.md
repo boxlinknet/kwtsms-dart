@@ -17,7 +17,7 @@ KWTSMS_TEST_MODE=1
 
 | # | File | Description | Needs credentials |
 |---|------|-------------|-------------------|
-| 00 | [`00_raw_api.dart`](00_raw_api.dart) | Raw API calls to every endpoint — no library, just dart:io. [Docs](00_raw_api.md) | Yes (hardcoded) |
+| 00 | [`00_raw_api.dart`](00_raw_api.dart) | Raw API calls to every endpoint, no library, just dart:io. [Docs](00_raw_api.md) | Yes (hardcoded) |
 | 01 | [`01_basic_usage.dart`](01_basic_usage.dart) | Verify credentials, check balance, send SMS, list sender IDs, check coverage | Yes |
 | 02 | [`02_otp_flow.dart`](02_otp_flow.dart) | OTP generation, validation, and sending to a single number | Yes |
 | 03 | [`03_bulk_sms.dart`](03_bulk_sms.dart) | Bulk SMS to >200 numbers with automatic batching | Yes |

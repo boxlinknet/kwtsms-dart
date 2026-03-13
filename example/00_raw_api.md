@@ -193,7 +193,7 @@ POST /API/send/
 - Phone numbers must include the country code (e.g., `96598765432` not `98765432`)
 - Multiple numbers: comma-separated in the `mobile` field, max 200 per request
 - `"test": "1"` queues the message but does NOT deliver it (no credits consumed permanently)
-- **Always save the `msg-id`** — you need it for status checks and delivery reports
+- **Always save the `msg-id`**: you need it for status checks and delivery reports
 - Sender ID is case-sensitive: `Kuwait` is not the same as `KUWAIT`
 
 ### 6. Message Status
