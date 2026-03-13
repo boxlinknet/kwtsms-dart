@@ -17,7 +17,7 @@ kwtSMS is a Kuwaiti SMS gateway trusted by top businesses to deliver messages an
 
 You need **Dart** (3.0 or newer) installed. If you use Flutter, Dart is included. Zero runtime dependencies.
 
-### Option A: Dart only (server-side / CLI)
+### Option A: Dart only (server-side)
 
 ```bash
 dart --version
@@ -571,31 +571,9 @@ See the [example/](example/) directory:
 | 05 | [Error Handling](example/05_error_handling.dart) | Handle all error types with user-facing messages |
 | 06 | [OTP Production](example/06_otp_production/) | Production OTP service: rate limiting, hashing, device attestation, resend cooldown |
 
-## CLI Usage
+## CLI
 
-Install globally:
-
-```bash
-dart pub global activate kwtsms
-```
-
-Commands:
-
-```bash
-kwtsms setup                                          # interactive wizard
-kwtsms verify                                         # test credentials, show balance
-kwtsms balance                                        # show available + purchased credits
-kwtsms senderid                                       # list sender IDs
-kwtsms coverage                                       # list active country prefixes
-kwtsms send 96598765432 "Hello from CLI"              # send SMS
-kwtsms send 96598765432,96512345678 "Hello everyone"  # multi-number
-kwtsms send 96598765432 "Test" --sender MY-APP        # custom sender
-kwtsms validate 96598765432 123 test@email.com        # validate numbers
-kwtsms status f4c841adee210f31307633ceaebff2ec        # check delivery status
-kwtsms dlr f4c841adee210f31307633ceaebff2ec           # delivery report
-kwtsms help                                           # show help
-kwtsms version                                        # show version
-```
+For command-line usage, see [kwtsms-cli](https://github.com/boxlinknet/kwtsms-cli), a standalone cross-platform binary (no Dart SDK required).
 
 ## FAQ
 

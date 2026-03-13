@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.11] - 2026-03-13
+
+### Removed
+- CLI tool (`bin/kwtsms.dart`) and CLI tests. Use [kwtsms-cli](https://github.com/boxlinknet/kwtsms-cli) instead (standalone binary, no Dart SDK required).
+
 ## [0.1.10] - 2026-03-07
 
 ### Added
