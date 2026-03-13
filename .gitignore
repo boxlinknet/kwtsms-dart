@@ -21,9 +21,16 @@ pubspec.lock
 
 # AI tooling (session data, project memory)
 .claude/
+CLAUDE.md
 
-# Internal docs (PRD, design docs — not part of the published package)
+# Internal docs (PRD, design docs, not part of the published package)
 doc/
+docs/
+
+# Misc
+*.zip
+Gemfile.lock
+.env.*
 
 # OS
 .DS_Store
